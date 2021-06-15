@@ -1,0 +1,88 @@
+# DCASE2021 preprocessing tuning transformer system(test)
+dev_directory:    ../dev_data
+eval_directory:   ../eval_data
+model_directory:  ../model/{model}/{config}/{feature}/{model_for}/{net}/{fit}/{eval}
+result_directory: ../result/{model}/{config}/{feature}/{model_for}/{net}/{fit}/{eval}/{decision}
+summary_ods:      ../result/{model}/{config}/_summary_{model}_{config}.ods
+summary_csv:      ../result/{model}/{config}/_summary_{model}_{config}.csv
+summary_xlsx:      ../result/{model}/{config}/_summary_{model}_{config}.xlsx
+result_file:      _result_{model}_{config}_{feature}_{model_for}_{net}_{fit}_{eval}_{decision}.csv
+
+transfer_learning:
+  # 転移学習時の設定
+  model_directory:  ../model/{model}/{config}/{feature}/{model_for}/{net}/{fit}/{eval}/{tl_fit}/{tl_eval}
+  result_directory: ../result/{model}/{config}/{feature}/{model_for}/{net}/{fit}/{eval}/{tl_fit}/{tl_eval}/{decision}
+  result_file:      _result_{model}_{config}_{feature}_{model_for}_{net}_{fit}_{eval}_{tl_fit}_{tl_eval}_{decision}.csv
+
+  # 転移学習時の条件(target='target')
+  tl_fit:
+    dropout: 0.1
+    lr: 1.0e-04          # param. tuning learning rate('--tl_lr' で指定)
+    val_split: 0.0       # 検証データは無し0.0とする(固定)
+    batch_size: 8        # ('--tl_batch_size で指定')
+    #                    # データ拡張
+    aug_count: 0         # 水増しする倍数(この倍数だけファイルを水増しする)(0は水増ししない)(eg. 10)
+                         # 水増しは、以下の変形を組合せて行う
+    aug_gadd: 0.0        # 偏差0～aug_gaddの正規乱数を重畳する(eg. 3.0e-4)
+    aug_wcut: 0          # 前後計この分の波形をランダムに削る(分析フレーム位置がずれる)(eg. 1024)
+
+  tl_eval:
+    epochs: 3 # 32       # domain adaptation training epochs ('--tl_epochs' で指定)
+    eval_epoch: best     # 評価に使うモデル { best | <num> | last } ('--tl_eval_epoch' で指定)
+
+net:
+  model: pptunetf        # DCASE2021  preprocessing tuning transformer system
+  n_enc_l: 2             # 階層数 num encoder layers
+  nhead: 4               # number of heads in attention
+  d_model : 16 # 128     # transformer data dimension
+  d_ff: 64 # 512         # transformer feed forward dimension
+  attn_type: linear      # eg. linear, causal-linear, ...
+  inp_layer: non-linear  # 入力層(linear, none, non-linear)
+  out_layer: linear      # 出力層
+  pos_enc: none          # position encoding(none, embed, sin_cos)
+
+model_for:               # domain 依存性
+  f_machine: 1           # machine_type 依存
+  f_section: 1           # section_index 依存
+  f_target: pp-raw-tf3   # pp-raw-tf6   # domain 依存
+
+decision:
+  max_fpr: 0.1
+  decision_thr: 0.9
+
+feature:
+  n_mels: 16 #128
+  n_frames: 5 # 16           # used as the sequence length for transformer layers
+  n_hop_frames: 8 # 1
+  n_fft: 1024
+  hop_length: 4096 #512
+  power: 2.0
+
+fit:
+  dropout: 0.1
+  lr: 1.0e-05              # learning rate
+  batch_size: 16 
+  shuffle: 1
+  val_split: 0.1
+  data_size: 20 # -1          # 学習データ制限数, '-1' to use all data
+  # データ拡張(通常学習)
+  aug_count: 0           # 水増しする倍数(この倍数だけファイルを水増しする)(0は水増ししない)(eg. 10)
+                         # 水増しは、以下の変形を組合せて行う
+  aug_gadd: 0.0          # 偏差0～aug_gaddの正規乱数を重畳する(eg. 3.0e-4)
+  aug_wcut: 0            # 前後計この分の波形をランダムに削る(分析フレーム位置がずれる)(eg. 1024)
+
+eval:
+  epochs: 2 # 10             # number of epochs
+  eval_epoch: best       # 評価に使うモデル { best | <num> | last } 
+
+misc: # these items do not affect evaluation result
+  batch_size: 8           # batch size while evaluation
+  shuffle: False          # shuffle while evaluation
+  save_freq: 10           # 保存頻度
+  overwrite: 0            # for debug
+  basedata_memory: extend # basedataとして保持するデータ(compact[遅い] or extend[速い])
+  restart_train: 1        # 途中から再開
+  config: test
+
+limit:
+  usable_machine_types: [ ToyCar ]
