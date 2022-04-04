@@ -26,7 +26,7 @@ _01_test.py
 _03_collect_results.py
 _04_run_job.py
 ```
-These scripts are indirectly called from the scripts under the run folder (for example, run \ pptunetf-test.py).
+These scripts are indirectly called from the scripts under the run folder (for example, "run\pptunetf\pptunetf-final.py").
 You can call them directly, but in that case you are responsible for giving full command line arguments by hands.
 To reduce the pain, it is recommended to use the scripts under the run folder.
 
