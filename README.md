@@ -63,3 +63,6 @@ dict(f_machine=1, f_section=1, f_target=0) # -> dependent on machine_type and se
 dict(f_machine=1, f_section=0, f_target=1) # -> dependent on machine_type and target (independent of section, transfer learning)
 dict(f_machine=1, f_section=1, f_target=1) # -> dependent on machine_type, section and target (transfer learning)
 ```
+
+## Reference
+https://dcase.community/documents/challenge2021/technical_reports/DCASE2021_Abe_61_t2.pdf
